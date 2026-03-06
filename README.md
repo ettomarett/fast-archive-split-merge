@@ -1,20 +1,14 @@
-# Fast Archive Split Merge
+# Fast Archive & Split
 
-Create and split TAR archives, merge parts back. Helps you move large files across disks (e.g. FAT32 limits, USB, network).
-
-Desktop application (Python 3.10+) to create TAR archives quickly, with optional gzip compression and optional split into FAT32-safe chunks (~4 GB). Merge split parts back into a single archive from the same UI.
-
-![Fast Archive & Split](https://github.com/ettomarett/fast-archive-split-merge/raw/main/assets/screenshot.png)
+Desktop application (Python 3.10+) to create TAR archives quickly without compression, with optional gzip compression and optional split into FAT32-safe chunks (~4 GB).
 
 ## Install
 
 - **Python 3.10+** with Tkinter (on Ubuntu/Debian install `python3-tk` if needed; on Windows use the official installer and ensure "tcl/tk" is selected).
-- **CustomTkinter** for the modern UI (rounded corners, consistent look on Windows and Linux).
+- No extra packages: the app uses only the standard library.
 
 ```bash
-# From the project root:
-pip install -r requirements.txt
-
+# Clone or copy the project, then from the project root:
 # Ubuntu/Linux
 ./run.sh
 
@@ -58,57 +52,19 @@ REM Or: python -c "import sys; sys.path.insert(0, '.'); from src.main import mai
 
 ## Rejoin / extract
 
-- **Merge split parts in the app**  
-  Click **Merge parts**, select any part file (e.g. `name.tar.part-001`). The app discovers all parts in the same folder and writes the merged archive there. Works on Windows and Linux (no `cat` or `copy /b` needed).
-
 - **Extract a single archive**  
-  Linux/macOS: `tar -xf name.tar` or `tar -xzf name.tar.gz`  
-  Windows: 7-Zip, WinRAR, or `tar -xf name.tar` (if tar is installed).
+  - Linux/macOS: `tar -xf name.tar` or `tar -xzf name.tar.gz`  
+  - Windows: 7-Zip, WinRAR, or `tar -xf name.tar` (if tar is installed).
 
-- **Rejoin split parts manually**  
-  Linux/macOS: `cat name.tar.part-* > name.tar` then `tar -xf name.tar`  
-  Windows: `copy /b name.tar.part-001+name.tar.part-002+... name.tar` (order matters), then extract with 7-Zip or similar.
+- **Rejoin split parts into one file**  
+  - Linux/macOS: `cat name.tar.part-* > name.tar` then `tar -xf name.tar`  
+  - Windows: `copy /b name.tar.part-001+name.tar.part-002+... name.tar` (order matters), then extract with 7-Zip or similar.
 
 ## Packaging (optional)
 
 - **Ubuntu**: Create an AppImage or use PyInstaller from the project root (add a spec that includes `src` and launches `src.main`).
 - **Windows**: Build an exe with PyInstaller, e.g. `pyinstaller --onefile --windowed -n "FastArchive" src/main.py` (adjust so that `src` package is included and the entry point is correct).
 
-## Repository (create and push)
-
-To create a new **private** GitHub repo named **fast archive split merge** and push this project using SSH:
-
-1. **Create the repo on GitHub**  
-   GitHub → New repository → Name: `fast-archive-split-merge` (or `fast archive split merge`) → Private → Create (do not add README or .gitignore).
-
-2. **Use the SSH key** (e.g. from `git_ssh.txt`)  
-   Save only the key block (lines starting with `-----BEGIN OPENSSH PRIVATE KEY-----` through `-----END OPENSSH PRIVATE KEY-----`) to a file, e.g. `github_key`.  
-   On Linux/macOS: `chmod 600 github_key`.
-
-3. **Init, commit, and push** (replace `YOUR_GITHUB_USER` with your GitHub username):
-
-   ```bash
-   cd "path/to/fast archive app"
-   git init
-   git add .
-   git commit -m "Initial commit: Fast Archive Split Merge"
-   git remote add origin git@github.com:YOUR_GITHUB_USER/fast-archive-split-merge.git
-   export GIT_SSH_COMMAND="ssh -i github_key -o IdentitiesOnly=yes"
-   git branch -M main
-   git push -u origin main
-   ```
-
-   On Windows (PowerShell):
-
-   ```powershell
-   $env:GIT_SSH_COMMAND = "ssh -i C:\path\to\github_key -o IdentitiesOnly=yes"
-   git push -u origin main
-   ```
-
 ## License
 
-Open source: **GNU General Public License v3.0 (GPL-3.0)**. See [LICENSE](LICENSE).
-
----
-
-**Developer:** Omar Ettalbi, SWE
+Use and modify as needed for your environment.
