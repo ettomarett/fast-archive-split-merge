@@ -31,8 +31,13 @@ def _tar_cmd_prefix() -> list[str]:
     return []
 
 
-def _probe_tar_compatible() -> bool:
+# Command to run tar (set by is_system_tar_available so we use the same executable everywhere)
+_tar_cmd: list[str] = ["tar"]
+
+
+def _probe_tar_compatible(tar_cmd: list[str] | None = None) -> bool:
     """Run a minimal tar -cf -C parent arcname; required for Windows (BS tar) compatibility."""
+    cmd = tar_cmd if tar_cmd is not None else _tar_cmd
     try:
         with tempfile.TemporaryDirectory() as td:
             parent = os.path.dirname(td)
@@ -40,7 +45,7 @@ def _probe_tar_compatible() -> bool:
             out = os.path.join(parent, "._tar_probe_out.tar")
             try:
                 r = subprocess.run(
-                    _tar_cmd_prefix() + ["tar", "-cf", out, "-C", parent, arcname],
+                    _tar_cmd_prefix() + cmd + ["-cf", out, "-C", parent, arcname],
                     capture_output=True,
                     timeout=10,
                     creationflags=_tar_creation_flags(),
@@ -56,20 +61,41 @@ def _probe_tar_compatible() -> bool:
         return False
 
 
-def is_system_tar_available() -> bool:
-    """True if system `tar` is available and compatible (-C / arcname). Fallback to False on Windows if probe fails."""
+def _try_tar_available(cmd: list[str], skip_version_check: bool = False) -> bool:
+    """Return True if tar at cmd runs and passes the compatibility probe."""
     try:
-        r = subprocess.run(
-            ["tar", "--version"],
-            capture_output=True,
-            timeout=5,
-            creationflags=_tar_creation_flags(),
-        )
-        if r.returncode != 0:
-            return False
-        return _probe_tar_compatible()
+        if not skip_version_check:
+            r = subprocess.run(
+                cmd + ["--version"],
+                capture_output=True,
+                timeout=5,
+                creationflags=_tar_creation_flags(),
+            )
+            if r.returncode != 0:
+                return False
+        return _probe_tar_compatible(cmd)
     except (FileNotFoundError, subprocess.TimeoutExpired, OSError):
         return False
+
+
+def is_system_tar_available() -> bool:
+    """True if system tar is available and compatible (-C / arcname). On Windows, try PATH then System32."""
+    global _tar_cmd
+    if _try_tar_available(["tar"]):
+        _tar_cmd = ["tar"]
+        return True
+    if os.name == "nt":
+        systemroot = os.environ.get("SystemRoot", "C:\\Windows")
+        win_tar = os.path.join(systemroot, "System32", "tar.exe")
+        if os.path.isfile(win_tar):
+            if _try_tar_available([win_tar]):
+                _tar_cmd = [win_tar]
+                return True
+            # BSD tar on Windows may not support --version; try probe only
+            if _try_tar_available([win_tar], skip_version_check=True):
+                _tar_cmd = [win_tar]
+                return True
+    return False
 
 
 def build_tar_system(
@@ -93,7 +119,7 @@ def build_tar_system(
         raise InterruptedError("Cancelled by user")
 
     proc = subprocess.Popen(
-        _tar_cmd_prefix() + ["tar", "-cf", output_path, "-C", parent, arcname],
+        _tar_cmd_prefix() + _tar_cmd + ["-cf", output_path, "-C", parent, arcname],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.PIPE,
         creationflags=_tar_creation_flags(),
@@ -215,7 +241,7 @@ def build_tar_system_streaming(
         raise InterruptedError("Cancelled by user")
 
     proc = subprocess.Popen(
-        _tar_cmd_prefix() + ["tar", "-cf", "-", "-C", parent, arcname],
+        _tar_cmd_prefix() + _tar_cmd + ["-cf", "-", "-C", parent, arcname],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         bufsize=CHUNK_READ_SIZE,

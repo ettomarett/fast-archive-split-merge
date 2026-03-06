@@ -26,23 +26,28 @@ REM Windows
 run.bat
 ```
 
-## Use
+## How to use
 
-### Create an archive (and optionally split it)
+In the app, click **How to use** for the same instructions in a popup; in that window, **Check if tar is installed** verifies whether Turbo mode is available.
 
-1. **Source Folder** — Folder to pack.
-2. **Output Folder** — Where to write the archive (and parts, if split).
-3. **Archive Name** — Base name only (e.g. `backup_2026`); `.tar` or `.tar.gz` is added automatically.
-4. **Format** — **Fast** (no compression), **Compressed** (gzip), or **Turbo** (system tar, fastest when available).
-5. **Split** — Turn on to get part files (e.g. 3900 MiB each for FAT32). With Turbo, splitting is streamed (no full archive on disk).
-6. **Keep original after split** — Keep the full archive file as well as the parts.
-7. Click **Start**, confirm, then wait. **Cancel** stops and removes partial output.
+### Create an archive
 
-**When to use what:** One `.tar` to move a folder to another PC. For a **FAT32 USB** or **size limits** (cloud/email), turn on **Split**, copy the parts, then on the other side use **Merge parts** (below). Use **Compressed** to shrink the file; **Turbo** for maximum speed on big or many files.
+- **Source Folder** — Folder to pack (use **Browse** to select).
+- **Output Folder** — Where the `.tar` or `.tar.gz` will be saved.
+- **Archive Name** — Base name only (e.g. `backup_2026` → `backup_2026.tar`).
+- **Format** — **Fast** (no compression, good for local copy), **Compressed** (gzip, smaller), or **Turbo** (system tar, fastest when installed).
+- **Split** — Turn on to split into chunks (e.g. 3900 MiB for FAT32). Optionally **Keep original archive after split** to keep the full file as well as the parts.
+- **Start** — Run the job. **Cancel** stops it. When done, **Open output folder** opens the result folder.
+
+**When to use what:** One `.tar` to move a folder to another PC. For **FAT32 USB** or **size limits** (cloud/email), turn on **Split**, copy the parts, then use **Merge parts** (below) on the other side. Use **Compressed** to shrink; **Turbo** for maximum speed.
 
 ### Merge parts (rejoin split files)
 
-After copying part files to the destination disk or PC: click **Merge parts**, choose any part file (e.g. `name.tar.part-001`). The app finds all parts in that folder, checks they are contiguous (001, 002, 003…), and writes one archive in the same folder. Progress and Cancel work like when creating. Same on Windows and Linux. Then extract with `tar -xf` or 7-Zip.
+- Use this to rejoin split parts (e.g. `name.part-001`, `name.part-002`) into one file.
+- **Folder…** — Select the folder that contains the `.part-001`, `.part-002`, … files.
+- **File…** — Select any part file (e.g. `name.part-001`); the app finds the rest.
+- **Merge** — Writes the full archive in the same folder (e.g. `name.tar`).
+- If the folder has more than one set of parts, pick a specific part file with **File…** instead of the folder.
 
 ## Output names
 

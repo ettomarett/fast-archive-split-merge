@@ -6,7 +6,7 @@ import queue
 import threading
 from typing import Callable
 
-from ..archive.merge import merge_parts
+from ..archive.merge import discover_parts_from_path, merge_parts
 from ..archive.split import split_file
 from ..archive.tar_build import build_tar
 from ..archive.tar_system import build_tar_system, build_tar_system_streaming
@@ -271,18 +271,17 @@ def run_archive_job(
 
 
 def run_merge_job(
-    part_paths: list[str],
-    output_path: str,
+    parts_path: str,
+    output_path: str | None,
     *,
     message_queue: queue.Queue,
     cancel_event: threading.Event,
 ) -> None:
     """
-    Merge part files into a single output file. Run in a separate thread.
-    Puts (ProgressState, log) in message_queue. On cancel/error, removes partial output.
+    Run in a separate thread. Discover part files from parts_path (file or folder);
+    merge into output_path. If output_path is None, write to same dir as parts with base name.
+    Puts ("state", ProgressState) and ("log", str) into message_queue.
     """
-    created_paths: list[str] = [output_path]
-
     def put(state: ProgressState, log: str = "") -> None:
         try:
             message_queue.put_nowait(("state", state))
@@ -294,32 +293,46 @@ def run_merge_job(
     def cancel_check() -> bool:
         return cancel_event.is_set()
 
-    def cleanup_partial() -> None:
-        for p in created_paths:
-            try:
-                if os.path.exists(p):
-                    os.remove(p)
-            except OSError:
-                pass
-
     try:
-        total_bytes = sum(os.path.getsize(p) for p in part_paths)
+        put(ProgressState(phase="scan", message="Discovering parts..."), "Discovering parts...")
+        sets = discover_parts_from_path(parts_path)
+        if not sets:
+            put(
+                ProgressState(phase="error", message="No part files found."),
+                "No .part-001, .part-002, ... files found at the given path.",
+            )
+            return
+        if len(sets) > 1:
+            put(
+                ProgressState(phase="error", message="Multiple archive sets in folder; pick one."),
+                "Multiple part sets found. Select a specific part file (e.g. name.part-001) instead of the folder.",
+            )
+            return
+        base_name, part_paths = sets[0]
+        if not part_paths:
+            put(ProgressState(phase="error", message="No parts."), "No part files.")
+            return
+
+        if output_path is None:
+            directory = os.path.dirname(part_paths[0])
+            output_path = os.path.join(directory, base_name)
+
+        total_size = sum(os.path.getsize(p) for p in part_paths)
         put(
             ProgressState(
                 phase="merge",
-                bytes_total=total_bytes,
-                message="Merging parts...",
+                bytes_total=total_size,
+                message="Merging...",
             ),
-            f"Merging {len(part_paths)} parts into {output_path}...",
+            f"Merging {len(part_paths)} parts into {output_path} ({total_size // (1024*1024)} MiB)...",
         )
 
-        def on_progress(bytes_done: int, part_index: int) -> None:
+        def on_progress(bytes_done: int, bytes_total: int) -> None:
             put(
                 ProgressState(
                     phase="merge",
                     bytes_done=bytes_done,
-                    bytes_total=total_bytes,
-                    part_index=part_index,
+                    bytes_total=bytes_total,
                     message="Merging...",
                 )
             )
@@ -331,23 +344,20 @@ def run_merge_job(
             cancel_check=cancel_check,
         )
         put(
-            ProgressState(phase="done", message="Success.", output_paths=[output_path]),
-            f"Success. Merged to: {output_path}",
+            ProgressState(phase="done", message="Merge complete.", output_paths=[output_path]),
+            f"Success. Merged: {output_path}",
         )
-    except InterruptedError as e:
-        cleanup_partial()
+    except InterruptedError:
         put(
-            ProgressState(phase="cancelled", message=str(e)),
+            ProgressState(phase="cancelled", message="Cancelled by user."),
             "Cancelled by user.",
         )
     except OSError as e:
-        cleanup_partial()
         put(
             ProgressState(phase="error", message=str(e)),
             f"IO error: {e}",
         )
     except Exception as e:
-        cleanup_partial()
         put(
             ProgressState(phase="error", message=str(e)),
             f"Error: {e}",

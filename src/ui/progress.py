@@ -5,8 +5,6 @@ import time
 
 import customtkinter as ctk
 
-from .theme import FONT_SIZE, PAD_X, PAD_Y
-
 
 class ProgressFrame(ctk.CTkFrame):
     """Progress bar + labels + scrollable log. Updated from main thread via set_state()."""
@@ -15,27 +13,26 @@ class ProgressFrame(ctk.CTkFrame):
         super().__init__(parent, fg_color="transparent", **kwargs)
         self._job_start_time: float | None = None
 
-        pad = {"padx": PAD_X, "pady": PAD_Y}
         self._lbl_status = ctk.CTkLabel(self, text="Ready.")
-        self._lbl_status.pack(anchor="w", **pad)
+        self._lbl_status.pack(anchor="w", padx=4, pady=2)
 
         self._lbl_files = ctk.CTkLabel(self, text="Files: — / —")
-        self._lbl_files.pack(anchor="w", **pad)
+        self._lbl_files.pack(anchor="w", padx=4, pady=2)
 
         self._lbl_bytes = ctk.CTkLabel(self, text="Bytes: — / —")
-        self._lbl_bytes.pack(anchor="w", **pad)
+        self._lbl_bytes.pack(anchor="w", padx=4, pady=2)
 
         self._lbl_speed = ctk.CTkLabel(self, text="Speed: — MB/s  ETA: —")
-        self._lbl_speed.pack(anchor="w", **pad)
+        self._lbl_speed.pack(anchor="w", padx=4, pady=2)
 
-        self._progress = ctk.CTkProgressBar(self, height=12, corner_radius=6)
-        self._progress.pack(fill="x", **pad)
+        self._progress = ctk.CTkProgressBar(self, mode="determinate", width=400)
         self._progress.set(0)
+        self._progress.pack(fill="x", padx=4, pady=6)
 
-        log_label = ctk.CTkLabel(self, text="Log", font=ctk.CTkFont(weight="bold"))
-        log_label.pack(anchor="w", **pad)
-        self._log = ctk.CTkTextbox(self, height=140, wrap="word", font=ctk.CTkFont(size=FONT_SIZE), state="disabled")
-        self._log.pack(fill="both", expand=True, **pad)
+        log_label = ctk.CTkLabel(self, text="Log", anchor="w")
+        log_label.pack(anchor="w", padx=4, pady=(8, 2))
+        self._log = ctk.CTkTextbox(self, height=160, wrap="word", state="disabled")
+        self._log.pack(fill="both", expand=True, padx=4, pady=4)
 
     def start_job(self) -> None:
         self._job_start_time = time.monotonic()
@@ -58,10 +55,10 @@ class ProgressFrame(ctk.CTkFrame):
                     self._lbl_speed.configure(text=f"Speed: {speed_mbs:.1f} MB/s  ETA: {eta_str}")
                 else:
                     self._lbl_speed.configure(text="Speed: — MB/s  ETA: —")
-            pct = min(1.0, bytes_done / bytes_total) if bytes_total else 0.0
-            self._progress.set(pct)
+            pct = 100 * bytes_done / bytes_total if bytes_total else 0
+            self._progress.set(min(1.0, pct / 100))
         if phase in ("done", "error", "cancelled"):
-            self._progress.set(1.0 if phase == "done" else 0.0)
+            self._progress.set(1.0 if phase == "done" else 0)
 
     def log(self, text: str) -> None:
         self._log.configure(state="normal")
