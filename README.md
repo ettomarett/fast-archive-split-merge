@@ -26,7 +26,7 @@ REM Or: python -c "import sys; sys.path.insert(0, '.'); from src.main import mai
 
 ## Use
 
-**When to use what:** Archive a project folder to **move it to another PC** (one `.tar` file). Need to **copy onto a FAT32 USB stick** or **stay under a cloud/email size limit?** Turn on **Split** so you get part files (e.g. 3900 MiB each), copy them over, then on the other side use **Merge parts** and pick any part — the app rebuilds the archive; extract with `tar` or 7-Zip. Use **Compressed** when the archive must be smaller (e.g. uploading); **Turbo** when you have huge or many files and want maximum speed. **Keep original after split** if you want both the full archive and the parts on the same machine (e.g. local backup + parts to take away).
+**When to use what:** Archive a project folder to **move it to another PC** (one `.tar` file). Need to **copy onto a FAT32 USB stick** or **stay under a cloud/email size limit?** Turn on **Split** so you get part files (e.g. 3900 MiB each), copy them over, then on the other side use **Merge parts** (see below). Use **Compressed** when the archive must be smaller (e.g. uploading); **Turbo** when you have huge or many files and want maximum speed. **Keep original after split** if you want both the full archive and the parts on the same machine (e.g. local backup + parts to take away).
 
 1. **Source Folder** — Choose the folder to archive.
 2. **Output Folder** — Choose where to write the archive (and parts, if split).
@@ -36,6 +36,8 @@ REM Or: python -c "import sys; sys.path.insert(0, '.'); from src.main import mai
 6. **Keep original archive after split** — If split is on, you can keep the full archive file as well as the parts.
 7. Click **Start**, confirm the recap, then wait. Use **Cancel** to stop and remove partial output.
 8. When done, use **Open output folder** if you want to see the files.
+
+**Merge parts (rejoin split files):** After you’ve copied part files to another disk or PC, click **Merge parts**, choose any part file (e.g. `name.tar.part-001`). The app finds all parts in that folder, checks they are contiguous (001, 002, 003…), and writes one archive (e.g. `name.tar`) in the same folder. Works the same on Windows and Linux (no `cat` or `copy /b` needed). Then extract with `tar -xf` or 7-Zip.
 
 ## Output names
 
@@ -56,13 +58,16 @@ REM Or: python -c "import sys; sys.path.insert(0, '.'); from src.main import mai
 
 ## Rejoin / extract
 
-- **Extract a single archive**  
-  - Linux/macOS: `tar -xf name.tar` or `tar -xzf name.tar.gz`  
-  - Windows: 7-Zip, WinRAR, or `tar -xf name.tar` (if tar is installed).
+- **Merge parts in the app**  
+  Click **Merge parts**, select any part file (e.g. `backup_2026.tar.part-001`). The app discovers all parts in that directory (they must be named `name.part-001`, `name.part-002`, … with no gaps), concatenates them in order, and writes the full archive (e.g. `backup_2026.tar`) in the same folder. Progress and Cancel work like when creating an archive. Same behaviour on Windows and Linux. Then extract the merged file with `tar` or 7-Zip.
 
-- **Rejoin split parts into one file**  
-  - Linux/macOS: `cat name.tar.part-* > name.tar` then `tar -xf name.tar`  
-  - Windows: `copy /b name.tar.part-001+name.tar.part-002+... name.tar` (order matters), then extract with 7-Zip or similar.
+- **Extract a single archive**  
+  Linux/macOS: `tar -xf name.tar` or `tar -xzf name.tar.gz`  
+  Windows: 7-Zip, WinRAR, or `tar -xf name.tar` (if tar is installed).
+
+- **Rejoin split parts manually (without the app)**  
+  Linux/macOS: `cat name.tar.part-* > name.tar` then `tar -xf name.tar`  
+  Windows: `copy /b name.tar.part-001+name.tar.part-002+... name.tar` (order matters), then extract with 7-Zip or similar.
 
 ## Packaging (optional)
 
