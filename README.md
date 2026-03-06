@@ -1,8 +1,8 @@
 # Fast Archive Split Merge
 
-Desktop application (Python 3.10+) to create TAR archives quickly, with optional gzip compression and optional split into FAT32-safe chunks (~4 GB). Merge split parts back into a single archive from the same UI. Modern look on Windows and Linux (CustomTkinter).
+Create and split TAR archives, merge parts back — same UI on Windows and Linux.
 
-**Developer:** Omar Ettalbi, SWE
+Desktop application (Python 3.10+) to create TAR archives quickly, with optional gzip compression and optional split into FAT32-safe chunks (~4 GB). Merge split parts back into a single archive from the same UI. Modern look on Windows and Linux (CustomTkinter).
 
 ![Fast Archive & Split](https://github.com/ettomarett/fast-archive-split-merge/raw/main/assets/screenshot.png)
 
@@ -108,3 +108,7 @@ To create a new **private** GitHub repo named **fast archive split merge** and p
 ## License
 
 Open source: **GNU General Public License v3.0 (GPL-3.0)**. See [LICENSE](LICENSE).
+
+---
+
+**Developer:** Omar Ettalbi, SWE
