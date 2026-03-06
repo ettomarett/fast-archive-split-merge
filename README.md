@@ -24,6 +24,8 @@ REM Or: python -c "import sys; sys.path.insert(0, '.'); from src.main import mai
 
 ## Use
 
+**When to use what:** Archive a project folder to **move it to another PC** (one `.tar` file). Need to **copy onto a FAT32 USB stick** or **stay under a cloud/email size limit?** Turn on **Split** so you get part files (e.g. 3900 MiB each), copy them over, then on the other side use **Merge parts** and pick any part — the app rebuilds the archive; extract with `tar` or 7-Zip. Use **Compressed** when the archive must be smaller (e.g. uploading); **Turbo** when you have huge or many files and want maximum speed. **Keep original after split** if you want both the full archive and the parts on the same machine (e.g. local backup + parts to take away).
+
 1. **Source Folder** — Choose the folder to archive.
 2. **Output Folder** — Choose where to write the archive (and parts, if split).
 3. **Archive Name** — Base name only (e.g. `backup_2026`). Extension is added automatically (`.tar` or `.tar.gz`).
