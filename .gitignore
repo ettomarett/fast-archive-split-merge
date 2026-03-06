@@ -19,6 +19,9 @@ env/
 .DS_Store
 Thumbs.db
 
+# Local docs (do not push)
+docs/README_GUIDE.md
+
 # Build / dist
 build/
 dist/
