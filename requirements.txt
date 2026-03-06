@@ -1,0 +1,3 @@
+# Fast Archive & Split — Python 3.10+
+# UI: CustomTkinter for a modern look (rounded corners, themes). Rest is stdlib.
+customtkinter>=5.2.0
