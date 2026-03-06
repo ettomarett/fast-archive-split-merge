@@ -2,6 +2,8 @@
 
 Desktop application (Python 3.10+) to create TAR archives quickly, with optional gzip compression and optional split into FAT32-safe chunks (~4 GB). Merge split parts back into a single archive from the same UI. Modern look on Windows and Linux (CustomTkinter).
 
+![Fast Archive & Split](assets/screenshot.png)
+
 ## Install
 
 - **Python 3.10+** with Tkinter (on Ubuntu/Debian install `python3-tk` if needed; on Windows use the official installer and ensure "tcl/tk" is selected).
