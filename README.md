@@ -2,6 +2,8 @@
 
 Desktop application (Python 3.10+) to create TAR archives quickly without compression, with optional gzip compression and optional split into FAT32-safe chunks (~4 GB).
 
+![Fast Archive & Split](https://github.com/ettomarett/fast-archive-split-merge/raw/main/assets/screenshot.png)
+
 ## Install
 
 - **Python 3.10+** with Tkinter (on Ubuntu/Debian install `python3-tk` if needed; on Windows use the official installer and ensure "tcl/tk" is selected).
@@ -69,4 +71,8 @@ REM Or: python -c "import sys; sys.path.insert(0, '.'); from src.main import mai
 
 ## License
 
-Use and modify as needed for your environment.
+Open source: **GNU General Public License v3.0 (GPL-3.0)**. See [LICENSE](LICENSE).
+
+---
+
+**Developer:** Omar Ettalbi, SWE
