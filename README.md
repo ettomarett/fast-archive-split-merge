@@ -4,6 +4,11 @@ Desktop app (Python 3.10+) to create TAR archives, optionally split them into si
 
 ![Fast Archive & Split](https://github.com/ettomarett/fast-archive-split-merge/raw/main/assets/screenshot.png)
 
+## Requirements
+
+- **System:** Windows 10+ or Linux; Python 3.10+ with Tkinter. For **Turbo** mode: system `tar` (GNU tar on Linux; Windows 10+ includes `tar`).
+- **Access:** Read access to the source folder and write access to the output folder. No API keys or online accounts. Optional: run with lower I/O priority on Linux if `ionice` is available (used automatically).
+
 ## Install
 
 - **Python 3.10+** with Tkinter (on Ubuntu/Debian install `python3-tk`; on Windows use the official installer with tcl/tk).
